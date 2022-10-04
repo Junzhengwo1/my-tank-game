@@ -2,11 +2,14 @@ package com.kou.tank.entity;
 
 import com.kou.tank.enume.TankDirEnum;
 import com.kou.tank.enume.TankEnum;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.Objects;
 
 /**
  * @author JIAJUN KOU
@@ -26,6 +29,9 @@ public class Tank {
     // 坦克移动速度
     private static  final int SPEED = 5;
 
+    // 坦克是否该移动
+    private boolean moving = false;
+
     // 坦克名称
     private String title;
 
@@ -42,8 +48,15 @@ public class Tank {
 
     // 画坦克
     public void paint(Graphics g) {
-        g.setColor(Color.blue);
-        g.fillRect(x,y, TankEnum.SIZE_X.getSize(),TankEnum.SIZE_Y.getSize());
+        try {
+            BufferedImage tankImg = ImageIO.read(Objects.requireNonNull(Tank.class.getClassLoader().getResourceAsStream("static/logo.png")));
+
+            g.drawImage(tankImg,x,y,TankEnum.SIZE_X.getSize(),TankEnum.SIZE_Y.getSize(),null);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         move();
     }
 
@@ -72,9 +85,9 @@ public class Tank {
     }
 
     private void setMainDir() {
-        if(!bL && !bU && !bR && !bD){
-            dirEnum = TankDirEnum.STOP;
-        }
+
+        moving = bL || bU || bR || bD;
+
         if (bL && !bU && !bR && !bD){
             dirEnum = TankDirEnum.L;
         }
@@ -90,6 +103,7 @@ public class Tank {
     }
 
     private void move() {
+        if (!moving) return;
         switch (dirEnum){
             case L:
                 x -= SPEED;
